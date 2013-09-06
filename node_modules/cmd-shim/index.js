@@ -90,7 +90,7 @@ function writeShim_ (from, to, prog, args, cb) {
     target = ""
     shTarget = ""
   } else {
-    longProg = "\"%~dp0\\" + prog + ".exe\""
+    longProg = "%~dp0\\" + prog
     shLongProg = "\"$basedir/" + prog + "\""
     target = "\"%~dp0\\" + target + "\""
     shTarget = "\"$basedir/" + shTarget + "\""
@@ -103,10 +103,14 @@ function writeShim_ (from, to, prog, args, cb) {
   // )
   var cmd
   if (longProg) {
-    cmd = "@IF EXIST " + longProg + " (\r\n"
-        + "  " + longProg + " " + args + " " + target + " %*\r\n"
+    cmd = "@SET longProgExists=false\r\n"
+        + "@IF EXIST \"" + longProg + ".exe\" SET longProgExists=true\r\n"
+        + "@IF EXIST \"" + longProg + ".cmd\" SET longProgExists=true\r\n"
+        + "@IF EXIST \"" + longProg + ".bat\" SET longProgExists=true\r\n"
+        + "@IF \"%longProgExists%\"==\"true\" (\r\n"
+        + "  \"" + longProg + "\" " + args + " " + target + " %*\r\n"
         + ") ELSE (\r\n"
-        + "  " + prog + " " + args + " " + target + " %*\r\n"
+        + "  \"" + prog + "\" " + args + " " + target + " %*\r\n"
         + ")"
   } else {
     cmd = prog + " " + args + " " + target + " %*\r\n"
